@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: logs
+  namespace: logs
+  labels:
+    app.kubernetes.io/name: logs
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "Access-Control-Allow-Origin: $http_origin";
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - www.domain.com
+      secretName: tls-logs
+  rules:
+    - host: www.domain.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: logs
+                port:
+                  number: 5000

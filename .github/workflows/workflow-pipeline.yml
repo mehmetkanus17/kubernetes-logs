@@ -15,7 +15,7 @@ on:
         - run-app
 
 env:
-  APP_IMAGE: ghcr.io/<github_name>/kubernetes-logs/<logs-app>
+  APP_IMAGE: ghcr.io/mehmetkanus17/kubernetes-logs/logs-app
   REGISTRY: ghcr.io
   NAMESPACE: logs
 
@@ -56,3 +56,4 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+# CD kısmını kendi yapılandırmanıza göre ister cd stage'inden ister gitops üzerinden uygulayabilirsiniz.

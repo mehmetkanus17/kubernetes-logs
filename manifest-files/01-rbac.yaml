@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: logs
+  namespace: logs
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: multi-namespace-log-reader-role
+rules:
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: logs-sa-read-access-in-backend
+  namespace: backend
+subjects:
+- kind: ServiceAccount
+  name: logs
+  namespace: logs
+roleRef:
+  kind: ClusterRole
+  name: multi-namespace-log-reader-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: logs-sa-read-access-in-backend-dev
+  namespace: backend-dev
+subjects:
+- kind: ServiceAccount
+  name: logs
+  namespace: logs
+roleRef:
+  kind: ClusterRole
+  name: multi-namespace-log-reader-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: logs-sa-read-access-in-frontend
+  namespace: frontend
+subjects:
+- kind: ServiceAccount
+  name: logs
+  namespace: logs
+roleRef:
+  kind: ClusterRole
+  name: multi-namespace-log-reader-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: logs-sa-read-access-in-frontend-dev
+  namespace: frontend-dev
+subjects:
+- kind: ServiceAccount
+  name: logs
+  namespace: logs
+roleRef:
+  kind: ClusterRole
+  name: multi-namespace-log-reader-role
+  apiGroup: rbac.authorization.k8s.io
+

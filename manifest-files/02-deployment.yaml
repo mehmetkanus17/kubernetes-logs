@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: logs
+  name: logs
+  labels:
+    app: logs
+spec:
+  replicas: 1
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: logs
+  template:
+    metadata:
+      labels:
+        app: logs
+    spec:
+      imagePullSecrets:
+        - name: ghcr # private repo için
+      containers:
+        - name: logs
+          image: ghcr.io/<github_name>/kubernetes-logs/<any_name>:latest
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: 220m
+            requests:
+              memory: 256Mi
+              cpu: 110m
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: logs
+      serviceAccountName: logs
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: logs
+  name: logs
+spec:
+  selector:
+    app: logs
+  ports:
+    - name: http
+      protocol: TCP
+      port: 5000

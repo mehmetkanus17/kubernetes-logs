@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kubernetes Logs App</title>
     <link rel="icon" type="image/x-icon" href="/static/favicon2.ico">
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon2.ico" type="image/x-icon">
     <style>
         body {
             font-family: sans-serif;
@@ -126,8 +126,8 @@
         <h2>Namespaces</h2>
         <div class="namespace-list">
             {% for ns in namespaces %}
-                <div class="namespace-item" onclick="loadPods('{{ ns.metadata.name }}')">
-                    {{ ns.metadata.name }}
+                <div class="namespace-item" onclick="loadPods('{{ ns }}')">
+                    {{ ns }}
                 </div>
             {% endfor %}
         </div>
@@ -177,6 +177,9 @@
         async function getLogs(namespace, pod) {
             const tail = document.getElementById('tail').value;
             const grep = document.getElementById('grep').value;
+            const logsContainer = document.getElementById('logs');
+
+            logsContainer.textContent = `Loading logs for ${pod} in ${namespace}...`;
 
             let url = `/logs/${namespace}/${pod}`;
             const params = [];
@@ -184,14 +187,20 @@
             if (grep) params.push(`grep=${grep}`);
             if (params.length > 0) url += `?${params.join("&")}`;
 
-            const response = await fetch(url);
-            const data = await response.json();
-            document.getElementById('logs').textContent = data.logs || data.error;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                logsContainer.textContent = data.error || data.logs;
+            } catch (error) {
+                logsContainer.textContent = `An error occurred while fetching logs: ${error}`;
+            }
         }
 
         function reloadLogs() {
             if (currentNamespace && currentPod) {
                 getLogs(currentNamespace, currentPod);
+            } else {
+                alert("Please select a namespace and a pod first.");
             }
         }
     </script>
